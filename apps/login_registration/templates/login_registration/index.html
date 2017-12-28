@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        {% load static %}
+        <!-- The line above tells Django to be ready to listen for static files -->
+        <link rel="stylesheet" href="{% static 'login_registration/css/main.css' %}" media="screen" title="no title" charset="utf-8">
+        <!-- Put the static files in the static folder inside your app.  Django collects files within all static folders and puts them within a single folder -->
+    </head>
+
+    <body>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="red">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
+        <h2>Registration</h2>
+        <form action="{% url 'lr:register' %}" method='post'>
+            {% csrf_token %}
+            First Name:
+            <br>
+            <input type="text" name="first_name" value="">
+            <br> Last Name:
+            <br>
+            <input type="text" name="last_name" value="">
+            <br> Email:
+            <br>
+            <input type="text" name="email" value="">
+            <br> Password:
+            <br>
+            <input type="password" name="password" value="">
+            <br> Confirm Password:
+            <br>
+            <input type="password" name="cpassword" value="">
+            <br>
+            <br>
+            <input type="submit" value="Register">
+        </form>
+        <h2>Login</h2>
+        
+        <form action="{% url 'lr:login' %}" method='post'>
+            {% csrf_token %}
+            Email:
+            <br>
+            <input type="text" name="email" value="">
+            <br> Password:
+            <br>
+            <input type="password" name="password" value="">
+            <br>
+            <br>
+            <input type="submit" value="Login">
+        </form>
+        
+    </body>
+</html>
