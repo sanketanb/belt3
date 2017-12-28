@@ -10,6 +10,7 @@
     </head>
 
     <body>
+        <h1>Welcome!</h1>
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -21,15 +22,12 @@
         <h2>Registration</h2>
         <form action="{% url 'lr:register' %}" method='post'>
             {% csrf_token %}
-            First Name:
+            Name:
             <br>
-            <input type="text" name="first_name" value="">
-            <br> Last Name:
+            <input type="text" name="name" value="">
+            <br> User Name:
             <br>
-            <input type="text" name="last_name" value="">
-            <br> Email:
-            <br>
-            <input type="text" name="email" value="">
+            <input type="text" name="username" value="">
             <br> Password:
             <br>
             <input type="password" name="password" value="">
@@ -37,6 +35,8 @@
             <br>
             <input type="password" name="cpassword" value="">
             <br>
+            Date hired:
+            <input type="date" name="date_hired" value="">
             <br>
             <input type="submit" value="Register">
         </form>
@@ -44,9 +44,9 @@
         
         <form action="{% url 'lr:login' %}" method='post'>
             {% csrf_token %}
-            Email:
+            Username:
             <br>
-            <input type="text" name="email" value="">
+            <input type="text" name="username" value="">
             <br> Password:
             <br>
             <input type="password" name="password" value="">

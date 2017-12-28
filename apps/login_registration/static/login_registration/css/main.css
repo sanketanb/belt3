@@ -5,3 +5,28 @@
     color: green;
     font-size: 20px;
 }
+table{
+    width: 80%;
+    border: 1px solid black;
+    margin-bottom: 25px;
+}
+thead {
+    background-color: grey;
+}
+tbody {
+    text-align: center;
+}
+tbody > tr:nth-child(even){
+    background-color: lightgray;
+}
+th, td {
+    height: 10px;
+}
+form{
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 400px;
+    vertical-align: top;
+    border: solid 1px black;
+}

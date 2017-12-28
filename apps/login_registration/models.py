@@ -2,51 +2,49 @@ from __future__ import unicode_literals
 from django.db import models
 import bcrypt
 import re
-NAME_REGEX = re.compile(r'[a-zA-Z]+')
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9\.\+_-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]*$')
+
 # models
+
 class UserManager(models.Manager):
     def validate(self, post_data):
         errors = []
         p = post_data
-        first_name, last_name, email, password, cpassword = p['first_name'], p['last_name'], p['email'], p['password'], p['cpassword']
+        name, username, password, cpassword, date_hired = p['name'], p['username'], p['password'], p['cpassword'], p['date_hired']
         
-        if not first_name or not last_name or not email or not password or not cpassword:
+        if not name or not username or not password or not cpassword or not date_hired:
             errors.append("All fields are required")
         else:
-            if len(first_name) < 2 or len(last_name) < 2 or not re.match(NAME_REGEX, first_name) or not re.match(NAME_REGEX, last_name):
+            if len(name) < 3 or len(username) < 3:
                 errors.append("Invalid names")            
-            if not re.match(EMAIL_REGEX, email):
-                errors.append("Invalid email") 
             if len(password) <8:
                 errors.append("Invalid password!")
             elif password != cpassword:
                 errors.append("Passwords must match")
         
         if not errors:
-            if self.filter(email=email):
-                errors.append("email already in use")
+            if self.filter(username=username):
+                errors.append("username already in use")
             else:     
                 hash_in = bcrypt.hashpw(password.encode(), bcrypt.gensalt())                
                 return self.create(
-                    firstname = first_name,
-                    lastname = last_name,
-                    email = email,
-                    password = hash_in
+                    name = name,
+                    username = username,
+                    password = hash_in,
+                    date_hired = date_hired
                 )    
         return errors
 
     def validate_login(self, login_data):
         errors = []
-        email, password = login_data['email'], login_data['password']
-        if not email or not password:
+        username, password = login_data['username'], login_data['password']
+        if not username or not password:
             errors.append("All fields are required")
         else:
-            if not re.match(EMAIL_REGEX, email) or len(password) <8:
+            if len(username) <3 or len(password) <8:
                 errors.append("Invalid fields") 
-            #  existing email check
+            #  existing username check
             else:
-                persons = self.filter(email=email)
+                persons = self.filter(username=username)
                 if len(persons) == 0:
                     errors.append("Please register")
                 else:
@@ -60,13 +58,46 @@ class UserManager(models.Manager):
                         errors.append("Invalid password")
         return errors
 
+class ProductManager(models.Manager):
+    def validate_new_product(self, product_data, id):
+        errors = []
+        product_name = product_data['product_name']
+        if not product_name:
+            errors.append("Field is required! Cannot be empty!!")
+        else:
+            if len(product_name) < 4:
+                errors.append("Invalid item/product!")
+            if not errors:
+                if self.filter(product_name=product_name):
+                    errors.append("Product already created")
+                else:                
+                    return self.create(
+                        product_name = product_name,
+                        user = User.objects.get(id=id)
+                    )    
+        return errors
+
 class User(models.Model):
-    firstname = models.CharField(max_length=255)
-    lastname = models.CharField(max_length=255)
-    email = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
+    date_hired = models.DateField()
     objects = UserManager()
-    def __str__(self):
-        return "<User object: {} {} {}>".format(self.firstname, self.lastname, self.email, self.password)
+    # def __str__(self):
+    #     return "<User object: {} {} {}>".format(self.name, self.username, self.password)
+
+class Product(models.Model):
+    product_name = models.CharField(max_length=255)
+    # one User can create many products
+    user = models.ForeignKey(User, related_name="products")
+    created_at = models.DateTimeField(auto_now_add = True)
+    objects = ProductManager()
+
+class Wish(models.Model):
+    # one Product can belong to many user's wishes
+    product = models.ForeignKey(Product, related_name="wishes")
+    # one User can have many wishes
+    user = models.ForeignKey(User, related_name="wishes")
+    created_at = models.DateTimeField(auto_now_add = True)

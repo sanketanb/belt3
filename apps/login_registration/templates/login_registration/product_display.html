@@ -10,14 +10,12 @@
     </head>
 
     <body>
-        <h2>Dash! Welcome, {{user.firstname}}</h2>
-        {% if messages %}
-        <ul class="green">
-            {% for message in messages %}
-            {{ message }}
-            {% endfor %}
-        </ul>
-        {% endif %}
-        <a href="{% url 'lr:logout' %}"><button>Logout</button></a>
+        <a href="{% url 'lr:dash' %}">Home</a> |
+        <a href="{% url 'lr:logout' %}">Logout</a><br>
+        <h2>{{product.product_name}}</h2>
+        <p>Users who added this product/item under their wishlist:</p>
+        {% for wish in wishes %}
+            <p>{{wish.user.name}}</p>
+        {% endfor %}
     </body>
 </html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        {% load static %}
+        <!-- The line above tells Django to be ready to listen for static files -->
+        <link rel="stylesheet" href="{% static 'login_registration/css/main.css' %}" media="screen" title="no title" charset="utf-8">
+        <!-- Put the static files in the static folder inside your app.  Django collects files within all static folders and puts them within a single folder -->
+    </head>
+
+    <body>
+        <h2>Hello, {{user.name}}!</h2>
+        {% if messages %}
+        <ul class="green">
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <a href="{% url 'lr:logout' %}">Logout</a><br>
+        <h3>Your wishlist: </h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Added by</th>
+                    <th>Date Added</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wish in wishes %}
+                <tr>
+                    <td><a href="{% url 'lr:product_display' wish.product.id %}">{{ wish.product.product_name }}</a></td>
+                    <td>{{ wish.product.user.name }}</td>
+                    <td>{{ wish.created_at }}</td>
+                    <td>
+                        {% if request.session.user_id == wish.product.user.id %}
+                            <a href="{% url 'lr:delete' wish.product.id %}">delete</a>
+                        {% else %}
+                            <a href="{% url 'lr:remove_from_wish' wish.id %}">remove from my list</a>
+                        {% endif %}   
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Other user's wishlist:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Added by</th>
+                    <th>Date Added</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td><a href="{% url 'lr:product_display' product.id %}">{{ product.product_name }}</a></td>
+                    <td>{{ product.user.name }}</td>
+                    <td>{{ product.created_at }}</td>
+                    <td>
+                        <a href="{% url 'lr:add_to_wish' product.id %}">Add to my wishlist</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'lr:create_display' %}">Add new</a>
+    </body>
+</html>
